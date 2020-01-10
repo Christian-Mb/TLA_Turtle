@@ -125,7 +125,7 @@ public class Parser {
 
 			if (getTokenClass() == TokenClass.intVal) {
 
-				// production A -> intVal S
+				
 
 				Token tokIntVal = getToken();
 				printNode(tokIntVal.getValue()); // affiche la valeur int

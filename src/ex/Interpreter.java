@@ -54,7 +54,9 @@ public class Interpreter {
 
 		int loop = 0;
 
-		getFirstRepeat();
+		if (findRepeat()) {
+			getFirstRepeat();
+		}
 
 		while (loop != tokens.size()) {
 

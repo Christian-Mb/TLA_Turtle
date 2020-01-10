@@ -28,22 +28,15 @@ public class AnalyseLexicale {
 			 //             espace lettre chiffre   [     ]         autre
 			/*  0 */    {      0,     1,      2,  101,  102,         null      },
 			/*  1 */    {    201,     1,      1,  201,  201,          null      },
-			/*  2 */    {    202,   202,      2,  202,  202,         null      },
-			
+			/*  2 */    {    202,   202,      2,  202,  202,         null      },			
 			
 
 			// 101 accepte [                        (goBack : non)
-			// 102 accepte ]                        (goBack : non)
-                        // 103 accepte repeat                   (goBack : non)
-                        // 104 accepte forward                  (goBack : non)
-                        // 105 accepte right                    (goBack : non)
-                        // 106 accepte left                     (goBack : non)
+			// 102 accepte ]                        (goBack : non)                     
                        
 		
-
 			// 201 accepte identifiant ou mot clé   (goBack : oui)
-			// 202 accepte entier                   (goBack : oui)
-			
+			// 202 accepte entier                   (goBack : oui)			
 			
 	};
 	
