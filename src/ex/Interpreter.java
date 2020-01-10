@@ -6,7 +6,7 @@ import analyseLexicale.AnalyseLexicale;
 import analyseLexicale.SourceReader;
 import analyseLexicale.Token;
 import analyseLexicale.TokenClass;
-import analyseSyntaxique.Parser;							
+import analyseSyntaxique.Parser;
 import javafx.scene.canvas.GraphicsContext;
 
 /**
@@ -25,7 +25,6 @@ public class Interpreter {
 
 	GraphicsContext gc;
 	private ArrayList<Token> tokens;
-	
 
 	/**
 	 * @param src
@@ -35,7 +34,6 @@ public class Interpreter {
 
 		SourceReader sr = new SourceReader(src);
 		tokens = new AnalyseLexicale().analyseLexicale(sr);
-		
 
 		try {
 			new Parser().parser(tokens);
@@ -49,13 +47,14 @@ public class Interpreter {
 		x = INIT_X;
 		y = INIT_Y;
 		direction = INIT_DIRECTION;
-		
+
 		Tortue t = new Tortue(direction, x, y, gc);
 
 		int loop = 0;
 
 		if (findRepeat()) {
-			getFirstRepeat();
+			getRepeat();
+			
 		}
 
 		while (loop != tokens.size()) {
@@ -112,16 +111,18 @@ public class Interpreter {
 	}
 
 	/**
-	 * Permet de recupérer les valeurs entre les crochets des autres repeat jusqu'à
-	 * ce qu'il y'en a plus
+	 * permet de trier la liste pour traiter les repeat, en outre on recupère
+	 * 
+	 * un repeat on sauvegarde sa valeur et on enregistre autant de fois ses valeurs
+	 * entre les crochets
 	 * 
 	 */
-	private void getOtherRepeat() {
+	private void getRepeat() {
 		Token token_tampon;
 		int position_debut = 0;
 		int position_fin = tokens.size();
 		int valeur_repeat = 0;
-		int compteur_rightHook = 0;
+		int compteur_leftHook = 0;
 		
 		/**
 		 * la premiere contient les tokens avant le repeat, 
@@ -131,7 +132,7 @@ public class Interpreter {
 		 * apres le crochet fermant du repeat puis je rassemble la liste
             a la fin on a une liste sans repeat sans chrochets
 		 */
-		
+
 		ArrayList<Token> liste1 = new ArrayList();
 		ArrayList<Token> liste2 = new ArrayList();
 		ArrayList<Token> liste3 = new ArrayList();
@@ -151,12 +152,12 @@ public class Interpreter {
 
 		token_tampon = tokens.get(position_fin);
 
-		while (token_tampon.getCl() != TokenClass.rightHook && compteur_rightHook != 0) {
-			if (token_tampon.getCl() == TokenClass.repeat) {
-				compteur_rightHook++;
+		while (token_tampon.getCl() != TokenClass.rightHook || compteur_leftHook != 0) {
+			if (token_tampon.getCl() == TokenClass.leftHook) {
+				compteur_leftHook++;
 			}
 			if (token_tampon.getCl() == TokenClass.rightHook) {
-				compteur_rightHook--;
+				compteur_leftHook--;
 			}
 			position_fin++;
 			token_tampon = tokens.get(position_fin);
@@ -168,7 +169,36 @@ public class Interpreter {
 		fusion(liste1, liste2, liste3);
 
 		if (findRepeat())
-			getOtherRepeat();
+			getRepeat();
+		;
+	}
+
+	/**
+	 * Permet d'ajouter les tokens dans les listes au moment du trie
+	 * 
+	 * @param position_debut
+	 * @param position_fin
+	 * @param liste1
+	 * @param liste2
+	 * @param liste3
+	 */
+	private void addToken(int position_debut, int position_fin, ArrayList<Token> liste1, ArrayList<Token> liste2,
+			ArrayList<Token> liste3) {
+		int valeur_repeat;
+		for (int i = 0; i < (position_debut - 3); i++) {
+			liste1.add(tokens.get(i));
+		}
+
+		for (int i = (position_fin); i < tokens.size(); i++) {
+			liste3.add(tokens.get(i));
+		}
+
+		valeur_repeat = Integer.parseInt(tokens.get(position_debut - 2).getValue());
+		for (int i = 1; i <= valeur_repeat; i++) {
+			for (int j = (position_debut); j < (position_fin - 1); j++) {
+				liste2.add(tokens.get(j));
+			}
+		}
 	}
 
 	/**
@@ -184,98 +214,6 @@ public class Interpreter {
 		tokens.addAll(liste1);
 		tokens.addAll(liste2);
 		tokens.addAll(liste3);
-	}
-
-	/**
-	 * Permet d'ajouter les Tokens dans les listes de trie
-	 * 
-	 * @param position_debut
-	 * @param position_fin
-	 * @param liste1
-	 * @param liste2
-	 * @param liste3
-	 */
-	private void addToken(int position_debut, int position_fin, ArrayList<Token> liste1, ArrayList<Token> liste2,
-			ArrayList<Token> liste3) {
-		int valeur_repeat;
-		for (int i = 0; i < (position_debut - 3); i++) {
-			liste1.add(tokens.get(i));
-		}
-
-		for (int i = (position_fin + 4); i < tokens.size(); i++) {
-			liste3.add(tokens.get(i));
-		}
-
-		valeur_repeat = Integer.parseInt(tokens.get(position_debut - 2).getValue());
-		for (int i = 1; i <= valeur_repeat; i++) {
-			for (int j = (position_debut); j <= (position_fin + 2); j++) {
-				liste2.add(tokens.get(j));
-			}
-		}
-	}
-
-	/**
-	 * Cette méthode permet de récupérer les valeurs entre les crochets du premier
-	 * repeat si le token existe. S'il existe encore d'autres repeat, elle appeler
-	 * la méthode getOtherReapt()
-	 * 
-	 */
-	private void getFirstRepeat() {
-
-		Token token_tampon;
-		int position_debut = 0;
-		int position_fin = tokens.size() - 1;
-		int valeur_repeat = 0;
-		
-		/**
-		 * la premiere contient les tokens avant le repeat, 
-		 * la deuxieme  contient les tokens entre les crochets du repeat autant de 
-		 * fois que la valeur du repeat et,
-		 *  la troisieme contient les tokens 
-		 * apres le crochet fermant du repeat puis je rassemble la liste
-            a la fin j'ai une liste sans repeat sans chrochets
-		 */
-
-		ArrayList<Token> liste1 = new ArrayList();
-		ArrayList<Token> liste2 = new ArrayList();
-		ArrayList<Token> liste3 = new ArrayList();
-
-		token_tampon = tokens.get(position_debut);
-
-		while (token_tampon.getCl() != TokenClass.leftHook) {
-			if (token_tampon.getCl() == TokenClass.repeat) {
-				position_debut++;
-			} else {
-				liste1.add(token_tampon);
-			}
-			position_debut++;
-			token_tampon = tokens.get(position_debut);
-		}
-
-		token_tampon = tokens.get(position_fin);
-
-		while (token_tampon.getCl() != TokenClass.rightHook) {
-			if (token_tampon.getCl() == TokenClass.repeat) {
-				position_fin--;
-			} else {
-				liste3.add(0, token_tampon);
-			}
-			position_fin--;
-			token_tampon = tokens.get(position_fin);
-		}
-
-		valeur_repeat = Integer.parseInt(tokens.get(position_debut - 1).getValue());
-
-		for (int i = 1; i <= valeur_repeat; i++) {
-			for (int j = (position_debut + 1); j < position_fin; j++) {
-				liste2.add(tokens.get(j));
-			}
-		}
-
-		fusion(liste1, liste2, liste3);
-
-		if (findRepeat())
-			getOtherRepeat();
 	}
 
 }
