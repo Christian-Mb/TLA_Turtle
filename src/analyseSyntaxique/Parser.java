@@ -57,10 +57,8 @@ public class Parser {
 				|| getTokenClass() == TokenClass.forward) {
 
 			// production S -> AS
-
-			profondeur++;
-			A();
-			profondeur--;
+		
+			A();			
 			S();
 
 			return;
@@ -89,7 +87,7 @@ public class Parser {
 
 		if (getTokenClass() == TokenClass.leftHook) {
 
-			// production S' -> [SS]
+			// production S' -> [S]
 
 			getToken();
 			printNode("[");
@@ -98,12 +96,12 @@ public class Parser {
 			S();
 
 			profondeur--;
-			S();
+			//S();
 
 			if (getTokenClass() == TokenClass.rightHook) {
 				getToken();
 				printNode("]");
-				S();
+				
 				return;
 			}
 
@@ -129,6 +127,7 @@ public class Parser {
 
 				Token tokIntVal = getToken();
 				printNode(tokIntVal.getValue()); // affiche la valeur int
+				
 
 				return;
 			}

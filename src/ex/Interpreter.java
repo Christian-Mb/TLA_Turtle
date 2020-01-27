@@ -15,8 +15,8 @@ import javafx.scene.canvas.GraphicsContext;
  */
 public class Interpreter {
 
-	final static double INIT_X = 100;
-	final static double INIT_Y = 100;
+	final static double INIT_X = 250;
+	final static double INIT_Y = 250;
 	final static double INIT_DIRECTION = 180;
 
 	double x;

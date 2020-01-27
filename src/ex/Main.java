@@ -15,8 +15,8 @@ import javafx.stage.Stage;
 public class Main extends Application {
 
     // dimension de la zone de dessin et de la zone de saisie
-    final static double WIDTH = 250;
-    final static double HEIGHT = 280;
+    final static double WIDTH = 500;
+    final static double HEIGHT = 500;
 
     public static void main(String[] args) {
         launch(args);
